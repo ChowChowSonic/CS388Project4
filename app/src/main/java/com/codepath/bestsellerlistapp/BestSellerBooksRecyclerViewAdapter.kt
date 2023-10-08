@@ -3,16 +3,18 @@ package com.codepath.bestsellerlistapp
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.codepath.bestsellerlistapp.R.id
 
 /**
- * [RecyclerView.Adapter] that can display a [BestSellerBook] and makes a call to the
+ * [RecyclerView.Adapter] that can display a [Movie] and makes a call to the
  * specified [OnListFragmentInteractionListener].
  */
 class BestSellerBooksRecyclerViewAdapter(
-    private val books: List<BestSellerBook>,
+    private val books: List<Movie>,
     private val mListener: OnListFragmentInteractionListener?
     )
     : RecyclerView.Adapter<BestSellerBooksRecyclerViewAdapter.BookViewHolder>()
@@ -28,12 +30,13 @@ class BestSellerBooksRecyclerViewAdapter(
      * (Yes, the same ones as in the XML layout files!)
      */
     inner class BookViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        var mItem: BestSellerBook? = null
+        var mItem: Movie? = null
         val mBookTitle: TextView = mView.findViewById<View>(id.book_title) as TextView
-        val mBookAuthor: TextView = mView.findViewById<View>(id.book_author) as TextView
-
+        val mBookRanking: TextView = mView.findViewById<View>(id.ranking) as TextView
+        val mBookDescription: TextView = mView.findViewById<View>(id.book_description) as TextView
+        val mBookImage: ImageView = mView.findViewById<View>(id.book_image) as ImageView
         override fun toString(): String {
-            return mBookTitle.toString() + " '" + mBookAuthor.text + "'"
+            return mBookTitle.toString()
         }
     }
 
@@ -45,7 +48,16 @@ class BestSellerBooksRecyclerViewAdapter(
 
         holder.mItem = book
         holder.mBookTitle.text = book.title
-        holder.mBookAuthor.text = book.author
+        holder.mBookRanking.text = book.upvotes.toString()
+        holder.mBookDescription.text = book.desc.slice(0..Integer.min(
+            150,
+            book.desc.length - 1
+        )
+        )
+        Glide.with(holder.mView)
+            .load("https://image.tmdb.org/t/p/w500/"+book.imgurl)
+            .centerInside()
+            .into(holder.mBookImage)
 
         holder.mView.setOnClickListener {
             holder.mItem?.let { book ->

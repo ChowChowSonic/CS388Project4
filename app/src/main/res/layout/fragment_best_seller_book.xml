@@ -7,22 +7,37 @@
     android:layout_height="wrap_content"
     android:layout_margin="6dp">
 
+    <ImageView
+        android:id="@+id/book_image"
+        android:transitionName="move"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        />
+
     <TextView
         android:id="@+id/book_title"
         android:textAppearance="?attr/textAppearanceListItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/book_image"
         app:layout_constraintStart_toStartOf="parent"
         />
 
     <TextView
-        android:id="@+id/book_author"
+        android:id="@+id/ranking"
         android:textAppearance="?attr/textAppearanceListItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/book_title"
         app:layout_constraintStart_toStartOf="parent"
+
         />
 
+    <TextView
+        android:id="@+id/book_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ranking" />
 </androidx.constraintlayout.widget.ConstraintLayout>

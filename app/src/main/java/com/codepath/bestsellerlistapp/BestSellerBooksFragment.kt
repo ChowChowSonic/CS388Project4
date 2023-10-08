@@ -1,26 +1,38 @@
 package com.codepath.bestsellerlistapp
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.codepath.bestsellerlistapp.R
+import com.codepath.asynchttpclient.AsyncHttpClient
+import com.codepath.asynchttpclient.RequestParams
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
+import okhttp3.Headers
+import org.json.JSONArray
+import org.json.JSONObject
+
 
 // --------------------------------//
 // CHANGE THIS TO BE YOUR API KEY  //
 // --------------------------------//
-private const val API_KEY = "<YOUR-API-KEY-HERE>"
+private const val API_KEY = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
 
 /*
  * The class for the only fragment in the app, which contains the progress bar,
  * recyclerView, and performs the network calls to the NY Times API.
  */
 class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
+
+    val movies = ArrayList<Movie>()
 
     /*
      * Constructing the view
@@ -46,10 +58,11 @@ class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
         progressBar.show()
 
         // Create and set up an AsyncHTTPClient() here
-
+        val client = AsyncHttpClient()
+        val request = RequestParams()
+        request["api_key"] = API_KEY
         // Using the client, perform the HTTP request
-
-        /* Uncomment me once you complete the above sections!
+        client["https://api.themoviedb.org/3/movie/popular", request,  object : JsonHttpResponseHandler()
         {
             /*
              * The onSuccess function gets called when
@@ -64,9 +77,23 @@ class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
                 progressBar.hide()
 
                 //TODO - Parse JSON into Models
-
-                val models : List<BestSellerBook> = null // Fix me!
-                recyclerView.adapter = BestSellerBooksRecyclerViewAdapter(models, this@BestSellerBooksFragment)
+                val booksJSON: JSONArray = json.jsonObject.get("results") as JSONArray
+                for(x in 0 until booksJSON.length()) {
+                    var bk: JSONObject = booksJSON.get(x) as JSONObject
+                    println(bk)
+                    movies.add(
+                        Movie(
+                            bk.getString("popularity"),
+                            bk.getString("vote_count"),
+                            bk.getString("vote_average"),
+                            bk.getString("original_title"),
+                            bk.getString("adult"),
+                            bk.getString("poster_path"),
+                            bk.getString("overview"),
+                        )
+                    )
+                }
+                recyclerView.adapter = BestSellerBooksRecyclerViewAdapter(movies, this@BestSellerBooksFragment)
 
                 // Look for this in Logcat:
                 Log.d("BestSellerBooksFragment", "response successful")
@@ -91,15 +118,27 @@ class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
                 }
             }
         }]
-        */
+        //*/
 
     }
 
     /*
      * What happens when a particular book is clicked.
      */
-    override fun onItemClick(item: BestSellerBook) {
-        Toast.makeText(context, "test: " + item.title, Toast.LENGTH_LONG).show()
+    override fun onItemClick(item: Movie) {
+//        val intent = Intent(context, ItemViewFragment::class.java)
+//        intent.putExtra(item.title, 1f)
+//        context?.startActivity(intent)
+        val f:Fragment = ItemViewFragment(item)
+        val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+
+        transaction.replace(R.id.content, f)
+        transaction.addToBackStack(null)
+//        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//            this.activity as Activity,
+//            (view?.findViewById(R.id.mvimg) as View?)!!, "move"
+//        )
+        transaction.commit()
     }
 
 }
